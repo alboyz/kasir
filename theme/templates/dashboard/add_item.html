@@ -1,0 +1,36 @@
+{% extends 'partials/base.html' %}
+
+{% block add_item %}
+{% load tailwind_filters %}
+
+  <div class="w-full p-4  text-red rounded-lg bg-gradient-to-r from-red-500 via-purple-500 to-yellow-500 lg:w-1/2 h-screen ">
+    <form action=""
+          class="mx-8" 
+          method="POST">
+      {% csrf_token %}
+      <h1 class="w-full text-4xl tracking-widest text-center m-8">{{title}}</h1>
+      <div class="flex-warp justify-center">
+        {{form|crispy}} 
+
+        <button type="submit"
+                class="bg-blue-400 w-full mt-4"
+                value="save">
+          Save
+        </button>
+
+      </div>
+    </form>
+  </div>
+
+
+{% endblock add_item %}
+
+{% comment %}<section class='py-2'>{% endcomment %}
+  {% comment %}<form method='POST' action="" class="w-full md:w-1/3 bg-white rounded-lg items-center">{% endcomment %}
+    {% comment %}{% csrf_token %}{% endcomment %}
+    {% comment %}<label for="catagory">Category</label> <br>{% endcomment %}
+    {% comment %}{{form.catagory}}{% endcomment %}
+
+    {% comment %}</form>{% endcomment %}
+  {% comment %}</section>{% endcomment %}
+
