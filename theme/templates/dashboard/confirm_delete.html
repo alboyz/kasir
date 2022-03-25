@@ -1,0 +1,30 @@
+{% extends 'partials/base.html' %}
+
+{% block delete %}
+
+
+<div class="w-full p-4  text-red rounded-lg bg-gradient-to-r from-red-500 via-purple-500 to-yellow-500 lg:w-1/2 h-screen ">
+  <form action="" class="mx-8" method="POST">
+    {% csrf_token %}
+    <h1 class="w-full text-4xl tracking-widest text-center m-8">
+      Apakah Anda Ingin Menghapus?
+    </h1>
+    <div class="flex-warp justify-center">
+      
+
+      <button type="submit" class="bg-red-400 w-full mt-4" value="yes">
+        ya
+      </button>
+
+      <a href="/list_item">
+        <div class="bg-blue-400">
+          cancel
+        </div>
+      </a>
+
+    </div>
+  </form>
+</div>
+
+
+{% endblock delete %}
