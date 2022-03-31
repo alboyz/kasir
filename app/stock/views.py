@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
+from datetime import datetime
 from .models import Stock
+import csv
+from openpyxl import Workbook
 from .forms import StockCreateForm, StockSearchForm, StockUpdateForm
 # Create your views here.
 
@@ -23,10 +26,13 @@ def list_item(request):
         "form": form,
     }
     if request.method == 'POST':
+
+        '''Search'''
         queryset = Stock.objects.filter(
             catagory__icontains=form['catagory'].value(),
             item_name__icontains=form['item_name'].value()
         )
+
         context = {
             "form": form,
             "title": title,
@@ -70,3 +76,57 @@ def delete_item(request, pk):
         queryset.delete()
         return redirect("/list_item")
     return render(request, "dashboard/confirm_delete.html")
+
+
+def exportCSV(request):
+    queryset = Stock.objects.all()
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment filename="{}.csv"' +\
+        str(datetime.now)
+    writer = csv.writer(response)
+    writer.writerow(['CATAGORY', 'ITEM NAME', 'QUANTITY'])
+    list_fields = queryset.values_list('catagory', 'item_name', 'quantity')
+    for queryset in list_fields:
+        writer.writerow(queryset)
+    return response
+
+
+def exportEXCEL(request):
+    queryset = Stock.objects.all()
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',)
+    response['Content-Disposition'] = 'attachment; filename=list-item.xlsx'.format(
+        datetime.now().strftime('%Y-%m-%d'),
+    )
+    workbook = Workbook()
+
+    # Get active worksheet/tab
+    worksheet = workbook.active
+    worksheet.title = 'List Item'
+
+    # Define the titles for columns
+    columns = [
+        'CATAGORY', 'ITEM NAME', 'QUANTITY'
+    ]
+    row_num = 1
+
+    # Assign the titles for each cell of the header
+    for col_num, column_title in enumerate(columns, 1):
+        cell = worksheet.cell(row=row_num, column=col_num)
+        cell.value = column_title
+    # Iterate through all list
+    for instance in queryset:
+        row_num += 1
+        row = [
+            instance.catagory,
+            instance.item_name,
+            instance.quantity,
+        ]
+        # Assign the data for each cell of the row
+        for col_num, cell_value in enumerate(row, 1):
+            cell = worksheet.cell(row=row_num, column=col_num)
+            cell.value = cell_value
+
+    workbook.save(response)
+
+    return response

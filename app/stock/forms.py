@@ -1,5 +1,7 @@
 from django import forms
+from django.http import HttpResponse
 from .models import Stock
+import csv
 
 
 class StockCreateForm(forms.ModelForm):
