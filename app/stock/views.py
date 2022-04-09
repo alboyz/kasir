@@ -1,19 +1,23 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from datetime import datetime
+from django.views import generic
 from .models import Stock
 import csv
 from openpyxl import Workbook
+from django.contrib import messages
 from .forms import StockCreateForm, StockSearchForm, StockUpdateForm
 # Create your views here.
 
 
-def index(request):
-    title = "Welcome This Is Home Page"
-    context = {
-        "title": title,
-    }
-    return render(request, 'dashboard/index.html', context)
+class IndexPageView(generic.TemplateView):
+    template_name = "dashboard/index.html"
+
+    def get_context_data(self, *args, **kwargs):
+        context = super(IndexPageView,  self).get_context_data(
+            *args, **kwargs)
+        context['title'] = "Welcome This Is Home Page"
+        return context
 
 
 def list_item(request):
@@ -45,6 +49,7 @@ def add_item(request):
     form = StockCreateForm(request.POST or None)
     if form.is_valid():
         form.save()
+        messages.success(request, "Berhasil Disimpan")
         return redirect('/list_item')
     context = {
         "form": form,
@@ -74,6 +79,8 @@ def delete_item(request, pk):
     form = StockUpdateForm(instance=queryset)
     if request.method == "POST":
         queryset.delete()
+        messages.success(request, "Berhasil Hapus")
+
         return redirect("/list_item")
     return render(request, "dashboard/confirm_delete.html")
 
